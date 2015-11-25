@@ -1,5 +1,6 @@
 var express = require('express'),
-    app = express();
+    app = express(),
+    path = require('path');
 app.use(express.bodyParser());
 
 var PRODUCTS = [
@@ -50,6 +51,11 @@ app.get('/products.json', function(req, res) {
   if (validTokenProvided(req, res)) {
     res.send(PRODUCTS);
   }
+});
+
+// Root route
+app.get('/', function(req, res) {
+    res.sendfile(path.join(__dirname, 'index.html'));
 });
 
 app.use(express.static(__dirname + '/public'));
