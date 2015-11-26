@@ -2,10 +2,13 @@ body {
     background:#ececec;
     font:13px/1.5 helvetica, arial, san-serif;
 }
-#main {
+#main, #main-login {
     width:950px;
     margin:auto;
     overflow:hidden;
+}
+#main-login {
+    width: 100%;
 }
 h1, #search-box, #filters-bar {
     margin-left:10px;
@@ -45,16 +48,20 @@ h1, #search-box, #filters-bar {
     padding:15px;
     margin:10px;
 }
+#product-panel li:hover {
+    cursor: pointer;
+}
 #product-panel li p {
     margin:10px 0 0 0;
 }
 
 #shopping-cart {
     float:left;
+    overflow: overlay;
     background:#ccc;
-    height:300px;
+    height:464px;
     width:300px;
-    padding:30px;
+    padding: 10px 30px;
     border:1px solid #474747;
 }
 
@@ -64,10 +71,12 @@ h1, #search-box, #filters-bar {
 }
 
 #shopping-cart li {
-    padding:3px;
-    margin:2px 0;
+    padding: 10px 5px;
+    margin: 10px 0;
     background:#ececec;
     border: 1px solid #333;
+    opacity: 1!important;
+    cursor: pointer;
 }
 
 #shopping-cart .product_name {
@@ -79,3 +88,22 @@ h1, #search-box, #filters-bar {
     display: inline-block;
     float:right;
 }
+
+#login-form-container {
+    text-align: center;
+}
+#login-form-errors {
+    color: red;
+}
+
+#login-form div {
+    text-align: center;
+    margin: 5px;
+    width: 100%;
+}
+
+    #login-form input, #login-form button {
+        width: 380px;
+        padding: 4px;
+        font-size: 22px;
+    }

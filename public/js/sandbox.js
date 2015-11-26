@@ -1,6 +1,8 @@
 var Sandbox =  {
     create : function (core, module_selector) {
-        var CONTAINER = core.dom.query('#' + module_selector);
+        var CONTAINER = core.dom.query('#' + module_selector),
+            sessionToken = core.getUrlParameter('token');
+
         return {
             find : function (selector) {
                 return CONTAINER.query(selector);
@@ -46,6 +48,59 @@ var Sandbox =  {
                     core.dom.apply_attrs(el, config);
                 }
                 return el;
+            },
+            removeElement : function (el) {
+                return core.dom.remove(el);
+            },
+            appendTo : function (el, toEl) {
+                return core.dom.appendTo(el, toEl);
+            },
+            prependTo : function (el, toEl) {
+                return core.dom.prependTo(el, toEl);
+            },
+            clone : function (el) {
+                return core.dom.clone(el);
+            },
+            ajax : function (config) {
+                return core.ajax(config);
+            },
+            getUrlParameter : function (urlParam) {
+                return core.getUrlParameter(urlParam);
+            },
+            loginViaAjax : function (usernameParam, passwordParam, successCallback) {
+                return core.ajax({
+                    url: '/auth.json',
+                    type: 'POST',
+                    dataType: "json",
+                    data: {
+                        username: usernameParam,
+                        password: passwordParam
+                    },
+                    success: function (loginResponse) {
+                        if (loginResponse.success) {
+                            if (loginResponse.token) {
+                                sessionToken = loginResponse.token;
+                            }
+                        }
+
+                        successCallback(loginResponse);
+                    }
+                });
+            },
+            getProductsViaAjax : function (successCallback) {
+                return core.ajax({
+                    url: '/products.json',
+                    type: 'GET',
+                    dataType: "json",
+                    data: {
+                        //token: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+                        token: sessionToken
+                    },
+                    success: successCallback
+                });
+            },
+            redirectTo : function (url) {
+                window.location.href = url + '?token=' + sessionToken;
             }
         };
     }

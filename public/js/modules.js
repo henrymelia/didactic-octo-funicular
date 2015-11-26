@@ -1,3 +1,49 @@
+CORE.create_module("search-box", function (sb) {
+    var searchInputField,
+        searchResetButton,
+        searchButton;
+
+    return {
+        init : function () {
+            /*
+            Maybe search would be better if we do it
+            listening to 'change' event on #search_input
+            */
+            
+            searchInputField = sb.find('#search_input')[0];
+
+            searchResetButton = sb.find('#quit_search');
+            sb.addEvent(searchResetButton, "click", this.reset);
+
+            searchButton = sb.find('#search_button');
+            sb.addEvent(searchButton, "click", this.searchProducts);
+        },
+        destroy : function () {
+            //sb.removeEvent(searchInputField, "change", this.searchProducts);
+            sb.removeEvent(searchResetButton, "click", this.reset);
+            sb.removeEvent(searchButton, "click", this.searchProducts);
+            
+            searchInputField = null;
+            searchResetButton = null;
+            searchButton = null;
+        },
+        reset : function () {
+            searchInputField.value = '';
+
+            sb.notify({
+                    type : 'quit-search',
+                    data : searchInputField.value
+                });
+        },
+        searchProducts : function () {
+            sb.notify({
+                    type : 'perform-search',
+                    data : searchInputField.value
+                });
+        }
+    };
+});
+
 CORE.create_module("filters-bar", function (sb) {
     var filters;
 
@@ -8,7 +54,7 @@ CORE.create_module("filters-bar", function (sb) {
         },
         destroy : function () {
             sb.removeEvent(filters, "click", this.filterProducts);
-            filter = null;
+            filters = null;
         },
         filterProducts : function (e) {
             sb.notify({
@@ -20,7 +66,8 @@ CORE.create_module("filters-bar", function (sb) {
 });
 
 CORE.create_module("product-panel", function (sb) {
-    var products;
+    var products,
+        shoppingCart;
 
     function eachProduct(fn) {
         var i = 0, product;
@@ -36,17 +83,15 @@ CORE.create_module("product-panel", function (sb) {
 
     return {
         init : function () {
-            var that = this;
+            shoppingCart = sb.find('#shopping-cart')[0];
 
-            products = sb.find("li");
+            this.updateProducts();
+            
             sb.listen({
                 'change-filter' : this.change_filter,
                 'reset-filter'  : this.reset,
                 'perform-search': this.search,
                 'quit-search'   : this.reset
-            });
-            eachProduct(function (product) {
-                sb.addEvent(product, 'click', that.addToCart);
             });
         },
         destroy : function () {
@@ -67,12 +112,92 @@ CORE.create_module("product-panel", function (sb) {
         },
         search : function (query) {
             reset();
-           query = query.toLowerCase();
+            query = query.toLowerCase();
+            
             eachProduct(function (product) {
                 if (product.getElementsByTagName('p')[0].innerHTML.toLowerCase().indexOf(query) < 0) {
                     product.style.opacity = '0.2';
                 }
             });
+        },
+        updateProducts : function () {
+            var productsList = sb.find('#products-list')[0],
+                that = this;
+
+            sb.getProductsViaAjax(function (productsResponse) {
+                for (productIndex = 0; productIndex < productsResponse.length; productIndex++) {
+                    currentProduct = productsResponse[productIndex];
+
+                    currentProduct = sb.create_element('li', {
+                        id: currentProduct.id,
+                        'data-8088-keyword': currentProduct.keyword,
+                        children: [
+                            sb.create_element('img', {
+                                'src': currentProduct.file
+                            }),
+                            sb.create_element('p', {
+                                text: currentProduct.name
+                            })
+                        ]
+                    });
+
+                    sb.appendTo(currentProduct, productsList);
+                }
+
+                products = sb.find("li");
+
+                eachProduct(function (product) {
+                    sb.addEvent(product, 'click', that.addToCart);
+                });
+            });
+        },
+        addToCart : function (e) {
+            var productAddedEl = e.currentTarget;
+            
+            sb.notify({
+                type: 'add-to-products-cart',
+                data: productAddedEl
+            })
+        }
+    };
+});
+
+CORE.create_module("shopping-cart", function (sb) {
+    var productsToBuyList;
+
+    function remove(ev) {
+        sb.removeElement(ev.currentTarget);
+    }
+
+    return {
+        init: function () {
+            productsToBuyList = sb.find('#to-buy-list')[0];
+
+            sb.listen({
+                'add-to-products-cart' : this.add
+            });
+        },
+        destroy: function () {
+            productsToBuyList = null;
+        },
+        add: function (el) {
+            var addedProductName = el.children[1].innerHTML;
+            
+            productAdded = sb.create_element('li', {
+                id: 'to_buy_' + el.id,
+                children: [
+                    sb.create_element('span', {
+                        'class': 'product_name',
+                        text: addedProductName
+                    }),
+                    sb.create_element('span', {
+                        'class': 'price'
+                    })
+                ]
+            });
+
+            sb.prependTo(productAdded, productsToBuyList);
+            sb.addEvent(productAdded, "click", remove);
         }
     };
 });

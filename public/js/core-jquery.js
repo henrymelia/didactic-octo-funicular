@@ -57,6 +57,21 @@ var CORE = (function () {
                 }
             }
         },
+        ajax : function (config) {
+            return jQuery.ajax(config);
+        },
+        getUrlParameter : function (urlParam) {
+            var urlParametersString = window.location.search.substring(1);
+            var urlParameters = urlParametersString.split('&');
+
+            for (var i = 0; i < urlParameters.length; i++) {
+                var parameter = urlParameters[i].split('=');
+                
+                if (parameter[0] == urlParam) {
+                    return parameter[1];
+                }
+            }
+        },
         registerEvents : function (evts, mod) {
             if (this.is_obj(evts) && mod) {
                 if (moduleData[mod]) {
@@ -132,6 +147,18 @@ var CORE = (function () {
             },
             create: function (el) {
                 return document.createElement(el);        
+            },
+            clone: function (el) {
+                return jQuery(el).clone();
+            },
+            remove: function (el) {
+                return jQuery(el).remove();
+            },
+            appendTo: function (el, toEl) {
+                return jQuery(el).appendTo(toEl);
+            },
+            prependTo: function (el, toEl) {
+                return jQuery(el).prependTo(toEl);
             },
             apply_attrs: function (el, attrs) {
                 jQuery(el).attr(attrs);             

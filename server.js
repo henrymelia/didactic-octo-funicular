@@ -1,7 +1,20 @@
 var express = require('express'),
     app = express(),
     path = require('path');
+
 app.use(express.bodyParser());
+
+var currentToken;
+
+function validTokenProvided(req, res) {
+  var userToken = req.body.token || req.param('token') || req.headers.token;
+
+  if (!currentToken || userToken != currentToken) {
+    return false;
+  }
+
+  return true;
+}
 
 var PRODUCTS = [
     {"id":"1", "keyword":"red", "file":"img/1.jpg", "name":"First Item"},
@@ -16,9 +29,8 @@ var PRODUCTS = [
     {"id":"10", "keyword":"mobile accessory", "file":"img/10.jpg", "name":"Tenth Item"}
 ];
 
-var currentToken;
+// AJAX auth route
 app.post('/auth.json', function(req, res) {
-
   var body = req.body,
       username = body.username,
       password = body.password;
@@ -37,25 +49,37 @@ app.post('/auth.json', function(req, res) {
   }
 });
 
-function validTokenProvided(req, res) {
-  var userToken = req.body.token || req.param('token') || req.headers.token;
-
-  if (!currentToken || userToken != currentToken) {
-    res.send(401, { error: 'Invalid token. You provided: ' + userToken });
-    return false;
-  }
-  return true;
-}
-
+// AJAX products route
 app.get('/products.json', function(req, res) {
   if (validTokenProvided(req, res)) {
     res.send(PRODUCTS);
+  }
+  else
+  {
+    res.send(401, { error: 'Invalid token.' });
+  }
+});
+
+// Login route
+app.get('/login', function(req, res) {
+  if (validTokenProvided(req, res)) {
+    res.redirect('/');
+  }
+  else
+  {
+    res.sendfile(path.join(__dirname, 'login.html'));
   }
 });
 
 // Root route
 app.get('/', function(req, res) {
+  if (validTokenProvided(req, res)) {
     res.sendfile(path.join(__dirname, 'index.html'));
+  }
+  else
+  {
+    res.redirect('/login');
+  }
 });
 
 app.use(express.static(__dirname + '/public'));
