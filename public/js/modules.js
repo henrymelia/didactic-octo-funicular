@@ -119,8 +119,8 @@ CORE.create_module("product-panel", function (sb) {
             reset();
             eachProduct(function (product) {
                 if (product.getAttribute("data-8088-keyword").toLowerCase().indexOf(filter.toLowerCase()) < 0) {
-                    //product.style.opacity = '0.2';
                     product.className = 'product-disabled';
+                    sb.removeEvent(product, 'click', addToCart);
                 }
             });
         },
