@@ -187,23 +187,46 @@ CORE.create_module("shopping-cart", function (sb) {
             productsToBuyList = null;
         },
         add: function (el) {
-            var addedProductName = el.children[1].innerHTML;
-            
-            productAdded = sb.create_element('li', {
-                id: 'to_buy_' + el.id,
-                children: [
-                    sb.create_element('span', {
-                        'class': 'product_name',
-                        text: addedProductName
-                    }),
-                    sb.create_element('span', {
-                        'class': 'price'
-                    })
-                ]
-            });
+            var productsToBuy = sb.find('li'),
+                qty_updated = false;
 
-            sb.prependTo(productAdded, productsToBuyList);
-            sb.addEvent(productAdded, "click", remove);
+            // Let's see if the product has been already added.
+            for (i = 0; i < productsToBuy.length; i++) {
+                if (productsToBuy[i].id === el.id) {
+                    qty = productsToBuy[i].getAttribute("data-qty");
+                    qty = parseInt(qty);
+
+                    productsToBuy[i].setAttribute("data-qty", ++qty);
+                    productsToBuy[i].children[2].innerHTML = 'x ' + qty;
+
+                    qty_updated = true;
+                    break;
+                }
+            }
+
+            // If the product isn't in the cart already.
+            if (!qty_updated) {
+                productAdded = sb.create_element('li', {
+                    id: el.id,
+                    'data-qty': 1,
+                    children: [
+                        sb.create_element('span', {
+                            'class': 'product_name',
+                            text: el.children[1].innerHTML
+                        }),
+                        sb.create_element('span', {
+                            'class': 'price'
+                        }),
+                        sb.create_element('span', {
+                            'class': 'product_qty',
+                            text: 'x 1'
+                        })
+                    ]
+                });
+
+                sb.prependTo(productAdded, productsToBuyList);
+                sb.addEvent(productAdded, "click", remove);
+            }
         }
     };
 });

@@ -161,7 +161,7 @@ var CORE = (function () {
                 return jQuery(el).prependTo(toEl);
             },
             apply_attrs: function (el, attrs) {
-                jQuery(el).attr(attrs);             
+                jQuery(el).attr(attrs);
             }
         },
         is_arr : function (arr) {

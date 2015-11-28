@@ -83,7 +83,7 @@ h1, #search-box, #filters-bar {
     cursor: pointer;
 }
 
-#shopping-cart .product_name {
+#shopping-cart .product_name, #shopping-cart .product_qty {
     display:inline-block;
     width:230px;
 }
