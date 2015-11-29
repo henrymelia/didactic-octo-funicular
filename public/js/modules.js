@@ -1,7 +1,8 @@
 CORE.create_module("search-box", function (sb) {
     var searchInputField,
         searchResetButton,
-        searchButton;
+        searchButton,
+        logoutLink;
 
     return {
         init : function () {
@@ -17,6 +18,9 @@ CORE.create_module("search-box", function (sb) {
 
             searchButton = sb.find('#search_button');
             sb.addEvent(searchButton, "click", this.searchProducts);
+
+            logoutLink = sb.find('a.logout');
+            sb.addEvent(logoutLink, "click", this.logout);
         },
         destroy : function () {
             //sb.removeEvent(searchInputField, "change", this.searchProducts);
@@ -26,6 +30,7 @@ CORE.create_module("search-box", function (sb) {
             searchInputField = null;
             searchResetButton = null;
             searchButton = null;
+            logoutLink = null;
         },
         reset : function () {
             searchInputField.value = '';
@@ -40,6 +45,9 @@ CORE.create_module("search-box", function (sb) {
                     type : 'perform-search',
                     data : searchInputField.value
                 });
+        },
+        logout : function () {
+            sb.logout();
         }
     };
 });
@@ -163,6 +171,8 @@ CORE.create_module("product-panel", function (sb) {
                 eachProduct(function (product) {
                     sb.addEvent(product, 'click', addToCart);
                 });
+
+                sb.showMainView();
             });
         }
     };

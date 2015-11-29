@@ -72,6 +72,9 @@ var CORE = (function () {
                 }
             }
         },
+        fadeIn : function (selector, speed) {
+            jQuery(selector).fadeIn(speed);
+        },
         registerEvents : function (evts, mod) {
             if (this.is_obj(evts) && mod) {
                 if (moduleData[mod]) {

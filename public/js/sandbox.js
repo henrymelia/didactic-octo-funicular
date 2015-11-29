@@ -1,7 +1,10 @@
 var Sandbox =  {
     create : function (core, module_selector) {
-        var CONTAINER = core.dom.query('#' + module_selector),
-            sessionToken = core.getUrlParameter('token');
+        var CONTAINER = core.dom.query('#' + module_selector);
+
+        if (sessionStorage.token === null) {
+
+        }
 
         return {
             find : function (selector) {
@@ -16,7 +19,7 @@ var Sandbox =  {
             notify : function (evt) {
                 if (core.is_obj(evt) && evt.type) {
                     core.triggerEvent(evt);
-                }         
+                }
             },
             listen : function (evts) {
                 if (core.is_obj(evts)) {
@@ -79,13 +82,18 @@ var Sandbox =  {
                     success: function (loginResponse) {
                         if (loginResponse.success) {
                             if (loginResponse.token) {
-                                sessionToken = loginResponse.token;
+                                //sessionToken = loginResponse.token;
+                                sessionStorage.token = loginResponse.token;
                             }
                         }
 
                         successCallback(loginResponse);
                     }
                 });
+            },
+            logout : function () {
+                delete sessionStorage.token;
+                window.location.href = '/login';
             },
             getProductsViaAjax : function (successCallback) {
                 return core.ajax({
@@ -94,13 +102,20 @@ var Sandbox =  {
                     dataType: "json",
                     data: {
                         //token: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
-                        token: sessionToken
+                        token: sessionStorage.token
                     },
-                    success: successCallback
+                    success: successCallback,
+                    error: function () {
+                        window.location.href = '/login';
+                    }
                 });
             },
             redirectTo : function (url) {
-                window.location.href = url + '?token=' + sessionToken;
+                //window.location.href = url + '?token=' + sessionToken;
+                window.location.href = url;
+            },
+            showMainView: function () {
+                core.fadeIn('div#main', 'fast');
             }
         };
     }

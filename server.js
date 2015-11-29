@@ -73,13 +73,14 @@ app.get('/login', function(req, res) {
 
 // Root route
 app.get('/', function(req, res) {
-  if (validTokenProvided(req, res)) {
+  res.sendfile(path.join(__dirname, 'index.html'));
+  /*if (validTokenProvided(req, res)) {
     res.sendfile(path.join(__dirname, 'index.html'));
   }
   else
   {
     res.redirect('/login');
-  }
+  }*/
 });
 
 app.use(express.static(__dirname + '/public'));
